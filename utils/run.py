@@ -5,13 +5,11 @@ from datetime import datetime, timezone
 from speckle_automate import AutomationContext
 from specklepy.objects.base import Base
 from specklepy.logging.exceptions import SpeckleException
-from specklepy.api import operations
-from specklepy.core.api.wrapper import StreamWrapper
-from specklepy.core.api.client import SpeckleClient
-from specklepy.logging.metrics import set_host_app
-from specklepy.transports.server import ServerTransport
+from specklepy.objects.models.collections.collection import Collection
 
 from main import FunctionInputs
+from utils.crs_utils import get_set_crs_settings
+from utils.display_utils import is_displayable, set_default_color
 
 
 def load_speckle_data(
@@ -21,7 +19,7 @@ def load_speckle_data(
     """Receive and process Speckle data, return geojson."""
     version_root_object = automate_context.receive_version()
 
-    speckle_data = traverse_data(commit_obj, comments)
+    speckle_data = traverse_data(version_root_object)
     
     set_actions(self, client, "GEO post-receive")
 
@@ -39,7 +37,7 @@ def load_speckle_data(
 
     return speckle_data
 
-def traverse_data(self, commit_obj, comments) -> Dict:
+def traverse_data(self, commit_obj) -> Dict:
     """Traverse Speckle commit and return geojson with features."""
 
     # from specklepy.objects.geometry import Point, Line, Curve, Arc, Circle, Ellipse, Polyline, Polycurve, Mesh, Brep
@@ -79,37 +77,14 @@ def traverse_data(self, commit_obj, comments) -> Dict:
         lambda x: [
             item
             for item in x.get_member_names()
-            if (x.speckle_type.split(":")[-1] not in supported_types or isinstance(x, VectorLayer))
-            and (isinstance(getattr(x, item, None), list) or (self.sourceApp is not None and "grasshopper" in self.sourceApp.lower() and x.speckle_type == "Base") )
+            if (x.speckle_type.split(":")[-1] not in supported_types or isinstance(x, Collection))
+            and (isinstance(getattr(x, item, None), list) )
         ],
     )
 
     # for the context list, save the displayable objects and Layers (for getting CRS for now)
-    context_list = [x for x in GraphTraversal([rule]).traverse(commit_obj) if isDisplayable(x.current) or x.current.speckle_type.endswith("VectorLayer")]
+    context_list = [x for x in GraphTraversal([rule]).traverse(commit_obj) if is_displayable(x.current) or x.current.speckle_type.endswith("VectorLayer")]
 
     get_set_crs_settings(self, commit_obj, context_list, data)
-
-    set_default_color(context_list)
-    self.material_color_proxies: dict = get_material_color_proxies(commit_obj)
-
-    create_features(self, context_list, comments, data)
-
-    # sort features by height 
-    
-    #if len(data['features']) == len(data['heights']):
-    #feat_array = np.array(data['features'])
-    #heights_array = np.array(data['heights'])
-    #inds = heights_array.argsort()
-    #sorted = feat_array[inds].tolist()
-    time1 = datetime.now()
-    sorted_list = sorted(data['features'], key=lambda d: d['max_height'])
-    for i, _ in enumerate(sorted_list):
-        sorted_list[i]["properties"]["FID"] = i+1 
-    data['features'] = sorted_list
-    time2 = datetime.now()
-    
-    time_operation = (time2-time1).total_seconds()
-    self.times["time_sort"] = time_operation
-    # print(f"Sorting time: {time_operation}")
 
     return data
