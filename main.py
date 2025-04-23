@@ -51,7 +51,7 @@ def automate_function(
     """
 
     # verify that it's a QGIS data
-    version: Version = automate_context.speckle_client.commit.get(automate_context.automation_run_data.triggers[0].payload.version_id, automate_context.automation_run_data.project_id)
+    version: Version = automate_context.speckle_client.version.get(automate_context.automation_run_data.triggers[0].payload.version_id, automate_context.automation_run_data.project_id)
     if version.source_application.lower() != "qgis":
         automate_context.mark_run_failed(
         "Automation failed: "
