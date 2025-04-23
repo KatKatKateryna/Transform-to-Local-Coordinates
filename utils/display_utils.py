@@ -1,7 +1,6 @@
 
+from specklepy.objects.geometry import Polyline, Point, Mesh
 from typing import List
-
-DEFAULT_COLOR = (255 << 24) + (150 << 16) + (150 << 8) + 150
 
 
 def is_displayable(obj: "Base") -> bool:
@@ -15,8 +14,7 @@ def is_displayable(obj: "Base") -> bool:
     elif hasattr(obj, '@displayValue'):
         displayValue = getattr(obj, '@displayValue')
     
-    # merge to sigle object, if List
-    if isinstance(displayValue, List):
+    if displayValue:
         return True
     
     return False
@@ -25,11 +23,8 @@ def is_displayable(obj: "Base") -> bool:
 def is_primitive(obj) -> bool:
     """Check if the object can be converted directly."""
     
-    from specklepy.objects.geometry import Polyline, Point, Line, Mesh
-
     if (
         isinstance(obj, Point) or
-        isinstance(obj, Line) or
         isinstance(obj, Polyline) or
         isinstance(obj, Mesh) 
         ):

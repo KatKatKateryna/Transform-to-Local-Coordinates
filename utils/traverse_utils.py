@@ -6,7 +6,7 @@ from utils.crs_utils import create_crs_from_wkt, create_custom_crs
 from utils.display_utils import is_displayable, is_primitive
 
 def traverse_transform_data(commit_obj, function_inputs: "FunctionInputs") -> Base:
-    """Traverse Speckle data and transform it's coordinates."""
+    """Traverse Speckle data and transform its coordinates."""
 
     wkt: str = commit_obj.crs["wkt"]
     crs_from = create_crs_from_wkt(wkt)

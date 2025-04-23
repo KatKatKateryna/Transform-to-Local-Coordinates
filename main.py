@@ -59,10 +59,11 @@ def automate_function(
         )
 
     version_root_object = automate_context.receive_version()
+
+    # transform coordinates of all geometries
     traverse_transform_data(version_root_object, function_inputs)
 
     automate_context.create_new_version_in_project(version_root_object, "local_gis_data")
-
     automate_context.mark_run_success("Data successfully reprojected.")
     return
 

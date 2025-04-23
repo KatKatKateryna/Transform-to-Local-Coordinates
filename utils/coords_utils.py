@@ -8,6 +8,7 @@ from specklepy.objects.geometry import Point, Polyline, Mesh
 
 
 def reproject_display_data_list(base_obj_list: List[Base], crs_from: CRS, crs_to: CRS)-> List[List[float]]:
+    """Updates the object with new reprojected coordinates."""
     for item in base_obj_list:
         if isinstance(item, Point):
             coords = [[item.x, item.y, item.z]]
@@ -33,7 +34,7 @@ def reproject_display_data_list(base_obj_list: List[Base], crs_from: CRS, crs_to
 
 
 def reproject_2d_coords_list(coords_in: List[List[float]], crs_from: CRS, crs_to: CRS) -> List[List[float]]:
-    """Return coordinates in a CRS of SpeckleProvider."""
+    """Return coordinates in a destination CRS."""
 
     transformer = Transformer.from_crs(
         crs_from,
