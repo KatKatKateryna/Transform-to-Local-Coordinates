@@ -3,14 +3,15 @@
 Use the automation_context module to wrap your function in an Automate context helper.
 """
 
-from pydantic import Field, SecretStr
+from pydantic import Field
 from speckle_automate import (
     AutomateBase,
     AutomationContext,
     execute_automate_function,
 )
 
-from flatten import flatten_base
+from specklepy.core.api.models import Version
+from utils.run import traverse_transform_data
 
 
 class FunctionInputs(AutomateBase):
@@ -21,13 +22,16 @@ class FunctionInputs(AutomateBase):
     https://docs.pydantic.dev/latest/usage/models/
     """
 
-    # An example of how to use secret values.
-    whisper_message: SecretStr = Field(title="This is a secret message")
-    forbidden_speckle_type: str = Field(
-        title="Forbidden speckle type",
+    lat: float = Field(
+        title="Latitude",
         description=(
-            "If a object has the following speckle_type,"
-            " it will be marked with an error."
+            "Latitude (in degrees) of the selected location."
+        ),
+    )
+    lon: float = Field(
+        title="Longitude",
+        description=(
+            "Longitude (in degrees) of the selected location."
         ),
     )
 
@@ -36,7 +40,7 @@ def automate_function(
     automate_context: AutomationContext,
     function_inputs: FunctionInputs,
 ) -> None:
-    """This is an example Speckle Automate function.
+    """This is a Speckle Automate function reprojecting QGIS data to be compatible with CAD and BIM data.
 
     Args:
         automate_context: A context-helper object that carries relevant information
@@ -45,37 +49,22 @@ def automate_function(
             It also has convenient methods for attaching result data to the Speckle model.
         function_inputs: An instance object matching the defined schema.
     """
-    # The context provides a convenient way to receive the triggering version.
-    version_root_object = automate_context.receive_version()
 
-    objects_with_forbidden_speckle_type = [
-        b
-        for b in flatten_base(version_root_object)
-        if b.speckle_type == function_inputs.forbidden_speckle_type
-    ]
-    count = len(objects_with_forbidden_speckle_type)
-
-    if count > 0:
-        # This is how a run is marked with a failure cause.
-        automate_context.attach_error_to_objects(
-            category="Forbidden speckle_type"
-            f" ({function_inputs.forbidden_speckle_type})",
-            object_ids=[o.id for o in objects_with_forbidden_speckle_type if o.id],
-            message="This project should not contain the type: "
-            f"{function_inputs.forbidden_speckle_type}",
-        )
+    # verify that it's a QGIS data
+    version: Version = automate_context.speckle_client.version.get(automate_context.automation_run_data.triggers[0].payload.version_id, automate_context.automation_run_data.project_id)
+    if version.source_application.lower() != "qgis":
         automate_context.mark_run_failed(
-            "Automation failed: "
-            f"Found {count} object that have one of the forbidden speckle types: "
-            f"{function_inputs.forbidden_speckle_type}"
+        "Automation failed: "
+        f"Source application {version.source_application} is not supported for this function."
         )
 
-        # Set the automation context view to the original model/version view
-        # to show the offending objects.
-        automate_context.set_context_view()
+    version_root_object = automate_context.receive_version()
+    traverse_transform_data(version_root_object, function_inputs)
 
-    else:
-        automate_context.mark_run_success("No forbidden types found.")
+    automate_context.create_new_version_in_project(version_root_object, "local_gis_data")
+
+    automate_context.mark_run_success("Data successfully reprojected.")
+    return
 
     # If the function generates file results, this is how it can be
     # attached to the Speckle project/model
