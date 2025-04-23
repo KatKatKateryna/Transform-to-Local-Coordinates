@@ -4,7 +4,7 @@ from typing import List
 DEFAULT_COLOR = (255 << 24) + (150 << 16) + (150 << 8) + 150
 
 
-def isDisplayable(obj: "Base") -> bool:
+def is_displayable(obj: "Base") -> bool:
 
     if is_primitive(obj):
         return True

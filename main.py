@@ -11,7 +11,7 @@ from speckle_automate import (
 )
 
 from specklepy.core.api.models import Version
-from utils.run import traverse_transform_data
+from utils.traverse_utils import traverse_transform_data
 
 
 class FunctionInputs(AutomateBase):
