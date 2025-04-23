@@ -52,10 +52,10 @@ def automate_function(
 
     # verify that it's a QGIS data
     version: Version = automate_context.speckle_client.version.get(automate_context.automation_run_data.triggers[0].payload.version_id, automate_context.automation_run_data.project_id)
-    if version.source_application.lower() != "qgis":
+    if version.sourceApplication.lower() != "qgis":
         automate_context.mark_run_failed(
         "Automation failed: "
-        f"Source application {version.source_application} is not supported for this function."
+        f"Source application {version.sourceApplication} is not supported for this function."
         )
 
     version_root_object = automate_context.receive_version()

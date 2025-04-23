@@ -19,6 +19,7 @@ def traverse_transform_data(commit_obj, function_inputs: "FunctionInputs") -> Ba
             for displayData in feature.displayValue:
 
                 display_list = []
+                # don't change Table items - only displayable objects
                 if is_displayable(displayData):
                     if is_primitive(displayData):
                         display_list = [displayData]
