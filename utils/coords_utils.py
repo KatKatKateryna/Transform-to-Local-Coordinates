@@ -21,7 +21,7 @@ def reproject_display_data_list(base_obj_list: List[Base], crs_from: CRS, crs_to
             for i in range(int(len(item.value)/3)):
                 coords.append([item.value[i*3], item.value[i*3+1], item.value[i*3+2]])
             new_coords = reproject_2d_coords_list(coords, crs_from, crs_to)
-            item.value = new_coords	
+            item.value = [item for sublist in new_coords for item in sublist]	
 
         elif isinstance(item, Mesh):
             coords = []
@@ -29,7 +29,7 @@ def reproject_display_data_list(base_obj_list: List[Base], crs_from: CRS, crs_to
                 coords.append([item.vertices[i*3], item.vertices[i*3+1], item.vertices[i*3+2]])	
 
             new_coords = reproject_2d_coords_list(coords, crs_from, crs_to)
-            item.vertices = new_coords
+            item.vertices = [item for sublist in new_coords for item in sublist]
 
 
 def reproject_2d_coords_list(coords_in: List[List[float]], crs_from: CRS, crs_to: CRS) -> List[List[float]]:

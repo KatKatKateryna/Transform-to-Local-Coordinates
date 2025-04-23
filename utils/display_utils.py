@@ -25,15 +25,12 @@ def is_displayable(obj: "Base") -> bool:
 def is_primitive(obj) -> bool:
     """Check if the object can be converted directly."""
     
-    from specklepy.objects.geometry import Polyline, Point, Line, Arc, Circle, Curve, Polycurve, Mesh, Brep
+    from specklepy.objects.geometry import Polyline, Point, Line, Mesh
 
     if (
         isinstance(obj, Point) or
         isinstance(obj, Line) or
         isinstance(obj, Polyline) or
-        isinstance(obj, Arc) or
-        isinstance(obj, Circle) or
-        isinstance(obj, Curve) or
         isinstance(obj, Mesh) 
         ):
             return True
