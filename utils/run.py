@@ -1,18 +1,5 @@
 
-from typing import Any, Dict
-
-from datetime import datetime, timezone
-from speckle_automate import AutomationContext
 from specklepy.objects.base import Base
-from specklepy.logging.exceptions import SpeckleException
-from specklepy.objects.other import Collection
-# from specklepy.objects.geometry import Point, Line, Curve, Arc, Circle, Ellipse, Polyline, Polycurve, Mesh, Brep
-# from specklepy.objects.GIS.layers import VectorLayer
-from specklepy.objects.data_objects import DataObject
-from specklepy.objects.graph_traversal.traversal import (
-    GraphTraversal,
-    TraversalRule,
-)
 
 from main import FunctionInputs
 from utils.coords_utils import reproject_display_data_list

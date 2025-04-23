@@ -1,6 +1,5 @@
 
 import copy
-import math
 from typing import List
 from pyproj import CRS, Transformer
 

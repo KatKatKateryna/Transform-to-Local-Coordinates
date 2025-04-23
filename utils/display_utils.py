@@ -1,5 +1,5 @@
 
-from typing import Dict, List, Tuple
+from typing import List
 
 DEFAULT_COLOR = (255 << 24) + (150 << 16) + (150 << 8) + 150
 
